@@ -31,7 +31,7 @@ scaled_training_set = scaled.fit_transform(training_set)
     # Adjusting training and validation sets.
     # The LSTM network will have consecutive data as input "time_step", and 1 data as output (the prediction from that "time_step" data). 
     # The training set will be formed in this way.
-time_step = 60
+time_step = 2
 X_train = []
 Y_train = []
 m = len(scaled_training_set)
