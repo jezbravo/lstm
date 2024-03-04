@@ -8,7 +8,7 @@ from keras.layers import LSTM, Dense
 np.random.seed(4)
 
 # DATASET
-dataset = pd.read_csv('AAPL_2006-01-01_to_2018-01-01.csv', index_col='Date', parse_dates=['Date'])
+dataset = pd.read_csv('apple_stocks.csv', index_col='Date', parse_dates=['Date'])
 
 # DATA PRE-PROCESSING
     # Training and validation sets.
@@ -19,9 +19,10 @@ validation_set = dataset['2017':].iloc[:,1:2]
 
 training_set['High'].plot(legend=True)
 validation_set['High'].plot(legend=True)
-plt.ylabel('Share value')
-plt.title('Training and Validation')
-plt.legend(['Training (2006-2016)', 'Validation (2017)'])
+plt.ylabel('Stock value ($ USD)')
+plt.xlabel('Time (years)')
+plt.title('Model Schema')
+plt.legend(['Training (2006-2016)', 'Validation (2017 - )'])
 plt.show()
 
     # Data normalization
@@ -73,11 +74,11 @@ prediction = model.predict(X_test)
 prediction = scaled.inverse_transform(prediction)
 
 def prediction_graph(real, prediction, validation_dates):
-    plt.plot(validation_dates[0:len(prediction)], real[0:len(prediction)], color='red', label='Real value of the share')
-    plt.plot(validation_dates[0:len(prediction)], prediction, color='blue', label='Stock prediction')
+    plt.plot(validation_dates[0:len(prediction)], real[0:len(prediction)], color='red', label='Real stock value')
+    plt.plot(validation_dates[0:len(prediction)], prediction, color='black', label='Stock value prediction')
     plt.ylim(1.1 * np.min(prediction) / 2, 1.1 * np.max(prediction))
-    plt.xlabel('Date')
-    plt.ylabel('Share value')
+    plt.xlabel('Time (months)')
+    plt.ylabel('Stock value ($ USD)')
     plt.title('Apple Stock Prediction')
     plt.xticks(rotation=45)
     plt.legend()
