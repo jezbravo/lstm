@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
-from keras.layers import LSTM, Dense
+from keras.layers import LSTM, Dense, Dropout
 
 np.random.seed(4)
 
@@ -11,9 +11,9 @@ np.random.seed(4)
 dataset = pd.read_csv('apple_stocks.csv', index_col='Date', parse_dates=['Date'])
 
 # DATA PRE-PROCESSING
-    # Training and validation sets.
-    # The LSTM will be trained with data prior to 2016. Validation will be done with data after 2017.
-    # In both cases, only the highest value of the action for each day will be used.
+# Training and validation sets.
+# The LSTM will be trained with data prior to 2016. Validation will be done with data after 2017.
+# In both cases, only the highest value of the action for each day will be used.
 training_set = dataset[:'2016'].iloc[:,1:2]
 validation_set = dataset['2017':].iloc[:,1:2]
 
@@ -25,14 +25,14 @@ plt.title('Model Schema')
 plt.legend(['Training (2006-2016)', 'Validation (2017 - )'])
 plt.show()
 
-    # Data normalization
+# Data normalization
 scaled = MinMaxScaler(feature_range=(0,1))
 scaled_training_set = scaled.fit_transform(training_set)
 
-    # Adjusting training and validation sets.
-    # The LSTM network will have consecutive data as input "time_step", and 1 data as output (the prediction from that "time_step" data). 
-    # The training set will be formed in this way.
-time_step = 2
+# Adjusting training and validation sets.
+# The LSTM network will have consecutive data as input "time_step", and 1 data as output (the prediction from that "time_step" data). 
+# The training set will be formed in this way.
+time_step = 7
 X_train = []
 Y_train = []
 m = len(scaled_training_set)
@@ -50,13 +50,14 @@ X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
 # CREATION AND TRAINING OF THE LSTM NETWORK
 input_data_size = (X_train.shape[1],1)
 output_data_size = 1
-neurons = 50
+neurons = 100
 
 model = Sequential()
 model.add(LSTM(units=neurons, input_shape=input_data_size))
+model.add(Dropout(0.2))  # Regularization with a 20% Dropout ratio to avoid overfitting
 model.add(Dense(units=output_data_size))
 model.compile(optimizer='rmsprop', loss='mse')
-model.fit(X_train,Y_train,epochs=20,batch_size=32)
+model.fit(X_train, Y_train, epochs=20, batch_size=32)
 
 # STOCK VALUE PREDICTION
 x_test = validation_set.values
